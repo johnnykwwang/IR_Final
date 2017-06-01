@@ -1,5 +1,6 @@
 from pymongo import MongoClient
-
+from bs4 import BeautifulSoup
+import requests
 
 class ClassCentralCrawler:
     DB_URL = 'mongodb://ir_final:irfinal2017@ds155091.mlab.com:55091/ir_final'
