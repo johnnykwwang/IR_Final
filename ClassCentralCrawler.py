@@ -5,7 +5,7 @@ import requests
 
 
 class ClassCentralCrawler:
-    DB_URI = 'mongodb://ir_final:irfinal2017@ds155091.mlab.com:55091/ir_final'
+    DB_URI = 'mongodb://ir_final:irfinal2017@ds141098.mlab.com:41098/ir_final'
     db = None
     collection = None
 
