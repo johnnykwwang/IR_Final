@@ -17,12 +17,12 @@ class ClassCentralCrawler:
     def parse(self,URL):
         response = requests.get(URL).text
         soup = BeautifulSoup(response,'html.parser')
-        embed()
         course_obj = {  'title': soup.h1.text, 
-                        'description': soup.find_all("div",class_="course-desc")[0],
+                        'description': str(soup.find_all("div",class_="course-desc")[0]),
                         'link': soup.find_all("a", class_="cta-button btn_go_to_class")[0]['href'],
                         'taglist':  [ x.text.rstrip() for x in soup.find_all("div", class_="taglist")[0].find_all('a') ],
                         }
+        embed()
         self.collection.insert_one(course_obj)
 
 crawler = ClassCentralCrawler()
