@@ -3,7 +3,6 @@ from IPython import embed
 from bs4 import BeautifulSoup
 import requests
 
-
 class ClassCentralCrawler:
     DB_URI = 'mongodb://ir_final:irfinal2017@ds141098.mlab.com:41098/ir_final'
     db = None
