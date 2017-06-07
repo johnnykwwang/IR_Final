@@ -14,7 +14,6 @@ https://www.class-central.com/mooc/5860/udacity-linear-algebra-refresher-course,
 https://www.class-central.com/mooc/1496/edx-introduction-to-probability-the-science-of-uncertainty,edX: Introduction to Probability - The Science of Uncertainty
 https://www.class-central.com/mooc/2583/coursera-probability,Coursera: Probability
 https://www.class-central.com/mooc/6830/edx-computational-probability-and-inference,edX: Computational Probability and Inference
-https://www.class-central.com/mooc/7800/coursera--,Coursera: 頑想學概率：機率一
 https://www.class-central.com/mooc/828/edx-introduction-to-statistics-probability,edX: Introduction to Statistics: Probability
 ##Descrete Mathematics
 https://www.class-central.com/mooc/8133/coursera-discrete-mathematics,Coursera: Discrete Mathematics
@@ -59,7 +58,6 @@ https://www.class-central.com/mooc/4356/coursera-responsive-website-tutorial-and
 https://www.class-central.com/mooc/3255/udacity-responsive-web-design-fundamentals,Udacity: Responsive Web Design Fundamentals
 https://www.class-central.com/mooc/4190/coursera-advanced-styling-with-responsive-design,Coursera: Advanced Styling with Responsive Design
 https://www.class-central.com/mooc/4191/coursera-responsive-website-basics-code-with-html-css-and-javascript,Coursera: Responsive Website Basics: Code with HTML, CSS, and JavaScript
-https://www.class-central.com/mooc/3338/edx-introduction-to-bootstrap-a-tutorial,edX: Introduction to Bootstrap – A Tutorial
 ##Cryptography
 https://www.class-central.com/mooc/1730/coursera-cryptography,Coursera: Cryptography
 https://www.class-central.com/mooc/616/coursera-cryptography-i,Coursera: Cryptography I
