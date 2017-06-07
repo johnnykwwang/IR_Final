@@ -1,0 +1,11 @@
+# Mac file system files
+*.DS_Store
+# jupyter notebook autosaving files
+.ipynb_checkpoints
+
+# Latex temp files
+*.fdb_latexmk
+*.log
+*.synctex.gz
+*.aux
+*.fls

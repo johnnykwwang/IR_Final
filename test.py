@@ -1,5 +1,6 @@
 import unittest
 from GoogleBooksContentCrawler import *
+from GoogleBooksSearcher import *
 
 class TestGoogleBooksContentCrawer(unittest.TestCase):
     def test_crawel(self):
@@ -16,6 +17,13 @@ class TestGoogleBooksContentCrawer(unittest.TestCase):
         'CHAPTER 14April Fools', 'CHAPTER 15Porn Cookie Guy', 'CHAPTER 16Going Public', 'CHAPTER 25The China Syndrome',
         'CHAPTER 26Googling Your Genes', 'APPENDIX I23 Google Search Tips', 'Appendix II',
         'APPENDIX IIIGoogles Financial Scorecard', 'A Note on Sources', 'Acknowledgments', 'Photo Credits', '版權所有']])
+
+class TestGoogleBooksSearcher(unittest.TestCase):
+    def test_search(self):
+        book_names = ['Computer Network']
+        gbs = GoogleBooksSearcher(book_names)
+        result = gbs.search()
+        self.assertEqual(result, ['https://www.googleapis.com/books/v1/volumes/BvaFreun1W8C'])
 
 if __name__ == '__main__':
     unittest.main()
