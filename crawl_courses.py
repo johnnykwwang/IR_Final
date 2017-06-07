@@ -8,9 +8,9 @@ TITLE = "title"
 BODY = "body"
 
 def classify(line):
-    if line.startwith("###"):
+    if line.startswith("###"):
         return WARN
-    elif line.startwith("##"):
+    elif line.startswith("##"):
         return TITLE
     else:
         return BODY
@@ -22,13 +22,13 @@ def separate_by_colom(line):
 
 def crawl_courses(filename, db=None):
     if db is None:
-        db = ClassCentralCrawler()
+        db = ClassCentralCrawler.ClassCentralCrawler()
 
     with open(filename, "r") as f:
         for line in f.readlines():
             cate = classify(line)
             if cate == BODY:
-                url = separate_by_colom(line)
+                url = separate_by_colom(line)[0]
                 print("Crawling url: {}".format(url))
                 db.parse(url)
 
@@ -38,8 +38,7 @@ def crawl_courses(filename, db=None):
 def main():
     filename = sys.argv[1]
     print("Reading from {}".format(filename))
-    return
-    db = ClassCentralCrawler()
+    db = ClassCentralCrawler.ClassCentralCrawler()
     crawl_courses(filename, db)
 
 
