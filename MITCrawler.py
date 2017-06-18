@@ -2,10 +2,22 @@ from pymongo import MongoClient
 from IPython import embed
 from bs4 import BeautifulSoup
 import requests
+import zipfile
+import urllib
 import json
+import itertools
+import pysrt
+import pickle
+import re
+
+def srt_to_text(srt):
+    subs = pysrt.from_string(srt)
+    text = [ s.text for s in subs]
+    return " ".join(text)
 
 class MITCrawler:
     DB_URI = 'mongodb://ir_final:irfinal2017@ds141098.mlab.com:41098/ir_final'
+    MIT_URL = 'https://ocw.mit.edu'
     db = None
     collection = None
     course_links = None
@@ -21,6 +33,7 @@ class MITCrawler:
         soup = BeautifulSoup(response,'html.parser')
         courses = soup.find_all("table",class_="courseList")[0].find_all('a',class_='preview')
         self.course_links = [ x['href'] for x in courses ]
+        self.course_links = list(set(self.course_links))
 
     def get_course_with_transcript(self):
         base_URL = "https://ocw.mit.edu"
@@ -42,6 +55,39 @@ class MITCrawler:
                         }
         self.collection.insert_one(course_obj)
 
+    def get_single_course_all_transcript(self,course_url):
+        course_url = self.MIT_URL + course_url 
+        response = requests.get(course_url).text
+        soup = BeautifulSoup(response,'html.parser')
+        course_title = soup.find_all('h1')[0].text
+        units = soup.find_all('div',class_='tlp_links')
+        lessons = [ u.select('li a') for u in units ]
+        lessons_all = list(itertools.chain.from_iterable(lessons))
+        lessons_all = [ {'link': les['href'], 'name': les.text } for les in lessons_all ]
+        for lesson in lessons_all:
+            try:
+                print('Class %s' % (lesson['name']),end='\r')
+                lesson_url = self.MIT_URL + lesson['link']
+                response = requests.get(lesson_url).text
+                soup = BeautifulSoup(response,'html.parser')
+                srt_link = soup.find_all('a',class_='poplink',href=re.compile('\.srt'))[0]['href']
+                response = requests.get(self.MIT_URL+srt_link).text
+                transcript = srt_to_text(response).replace('\n',' ')
+                lesson['script'] = transcript
+            except IndexError:
+                print('quiz or srt not found')
+            except KeyError:
+                print('Lesson error')
+        # self.collection.insert({'course_title':course_title,'lessons':lessons_all})
+        with open('mit-courses-transcript/'+course_title.replace('/',' '),'wb+') as f:
+            pickle.dump(lessons_all,f)
+
 crawler = MITCrawler()
 crawler.get_course_list()
-crawler.get_course_with_transcript()
+# embed()
+# crawler.course_links = pickle.load(open('mit-course-with-transcript','rb'))
+
+for course in crawler.course_links:
+    crawler.get_single_course_all_transcript(course)
+
+# crawler.get_course_with_transcript()
