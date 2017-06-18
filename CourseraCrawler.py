@@ -47,18 +47,16 @@ class CourseraCrawler:
         soup = BeautifulSoup(response,'html.parser')
         course_title = soup.find_all('h1')[0].text
         lessons = soup.find_all('div',class_='module-name headline-2-text')
-        # lessons_all = [ {'name': les } for les in lessons ]
         print('Course %s' % (course_title),end='\r')
-        lessons_all = []
+        course = {'title':course_title,'url':course_url,'lessons':[]}
         for lesson in lessons:
             lesson_hash = {}
             lesson_hash['name'] = lesson.text
             lesson_hash['desc'] = lesson.find_next(class_="module-desc").text
-            lessons_all.append(lesson_hash)
+            course['lessons'].append(lesson_hash)
         
-        # self.collection.insert({'course_title':course_title,'lessons':lessons_all})
         with open('coursera/'+course_title.replace('/',' '),'wb+') as f:
-            pickle.dump(lessons_all,f)
+            pickle.dump(course,f)
 
 crawler = CourseraCrawler()
 crawler.get_course_list()
