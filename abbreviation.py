@@ -9,8 +9,8 @@ class Abbreviate:
     abbreviation_url = [
         'http://www.stands4.com/services/v2/abbr.php',
     ]
-    # uid
-    # tid
+    uid = 5812
+    tid = '1I3AHWHDOvS3SSX7'
 
     def __init__(self):
         pass
