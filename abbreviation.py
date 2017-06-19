@@ -33,16 +33,17 @@ class Abbreviate:
             'searchtype': 'e'
         }
         
-        response = requests.get(self.urls[0], params=payload)
-        return response
+        response = requests.get(self.abbreviation_url[0], params=payload)
+        return response.content
 
     def parse_abb_response(self, response, cate=None):
         # parse the response from www.abbreivations.com
         root = ET.fromstring(response)
-        if cate is not None:
-            result = [root[i][1].text for i in range(len(root)) if root[i][2] == cate]
-        else:
-            result = [root[i][1].text for i in range(len(root))]
+        result = []
+        for each_result in list(root):
+            for tag in list(each_result):
+                if tag.tag == 'definition':
+                    result.append(tag.text)
         return result
         
     def run_deabbreviate(self, term=None):
