@@ -1,5 +1,6 @@
 # Mac file system files
 *.DS_Store
+coursera/
 # jupyter notebook autosaving files
 .ipynb_checkpoints
 
