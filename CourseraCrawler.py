@@ -27,7 +27,7 @@ class CourseraCrawler:
     course_links = None
 
     def __init__(self):
-        pass
+        self.driver = webdriver.Chrome(executable_path=r'./chromedriver')
         # client = MongoClient(self.DB_URI)
         # self.db = client.ir_final
         # self.collection = self.db.get_collection('cou_courses')
@@ -44,17 +44,23 @@ class CourseraCrawler:
         # self.course_links = [ x['href'] for x in courses ]
         # self.course_links = list(set(self.course_links))
 
+    def login(self):
+        self.driver.get(self.COURSERA_URL)
+        login_btn = self.driver.find_element_by_css_selector('li.c-ph-right-nav-button.c-ph-log-in')
+        login_btn.click()
+        self.driver.find_element_by_name('email').send_keys('dondonb01501085@gmail.com')
+        self.driver.find_element_by_name('password').send_keys('irfinal2017')
+        self.driver.find_element_by_name('password').submit()
     def get_single_course_all_syllabus(self,course_url):
-        course_url = self.COURSERA_URL + course_url 
+        course_url = self.COURSERA_URL + course_url + '?authMode=login' 
         
-        driver = webdriver.Chrome(executable_path=r'./chromedriver')
-        driver.get(course_url)
+        #driver = webdriver.Chrome(executable_path=r'./chromedriver')
+        self.driver.get(course_url)
         print(course_url)
-        time.sleep(0.2)
-        btn = driver.find_element_by_xpath("//button[contains(text(),'View Full Syllabus')]")
         try:
+            btn = self.driver.find_element_by_css_selector('div.toggle-button-wrapper')
             btn.click()
-        finally:
+        except:
             print('cant click open')
         # try:
         #     element = WebDriverWait(driver, 10).until(
@@ -63,16 +69,17 @@ class CourseraCrawler:
         # finally:
         #     driver.quit()
         time.sleep(1)
-        elements = driver.find_elements_by_xpath("//button[contains(text(),'expand')]")
-        elements += driver.find_elements_by_xpath("//button[contains(text(),'more')]")
+        elements = self.driver.find_elements_by_xpath("//button[contains(text(),'expand')]")
+        elements += self.driver.find_elements_by_xpath("//button[contains(text(),'more')]")
         for e in elements:
             try:
                 e.click()
+                time.sleep(0.5)
             except:
                 pass
             # finally:
                 # print('no click')
-        soup = BeautifulSoup(driver.page_source,'html.parser')
+        soup = BeautifulSoup(self.driver.page_source,'html.parser')
         course_title = soup.find_all('h1')[0].text
         lessons = soup.find_all('div',class_='module-name headline-2-text')
         print('Course %s' % (course_title),end='\r')
@@ -86,10 +93,11 @@ class CourseraCrawler:
                 if "Video" in m.find(class_="body-2-text").text:
                     lesson_hash['desc'] += " " + m.find(class_="body-1-text").text
             course['lessons'].append(lesson_hash)
-        with open('coursera/'+course_title.replace('/',' '),'wb+') as f:
+        with open('coursera/'+course_title.replace('/',' '),'wb') as f:
             pickle.dump(course,f)
 
 crawler = CourseraCrawler()
+crawler.login()
 crawler.get_course_list()
 for course in crawler.course_links:
     time.sleep(1)
