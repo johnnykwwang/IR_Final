@@ -1,4 +1,4 @@
-from IPython import embed
+#from IPython import embed
 from bs4 import BeautifulSoup
 import requests
 import urllib
@@ -22,5 +22,5 @@ class WikiCrawler:
 
         return definition,words
 
-crawler = WikiCrawler()
-embed()
+#crawler = WikiCrawler()
+#embed()
