@@ -2,6 +2,12 @@ from pymongo import MongoClient
 from IPython import embed
 from bs4 import BeautifulSoup
 from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+
 
 import unicodedata
 import requests
@@ -58,9 +64,9 @@ class CourseraCrawler:
         self.driver.get(course_url)
         print(course_url)
         try:
-            btn = self.driver.find_element_by_css_selector('div.toggle-button-wrapper')
+            btn = self.driver.find_element_by_css_selector('button.toggle-button.cdp-view-all-button.passive')
             btn.click()
-        except:
+        except :
             print('cant click open')
         # try:
         #     element = WebDriverWait(driver, 10).until(
@@ -68,17 +74,24 @@ class CourseraCrawler:
         #     )
         # finally:
         #     driver.quit()
-        time.sleep(1)
-        elements = self.driver.find_elements_by_xpath("//button[contains(text(),'expand')]")
-        elements += self.driver.find_elements_by_xpath("//button[contains(text(),'more')]")
+        #time.sleep(5)
+        
+        elements = self.driver.find_elements_by_css_selector('button.button-link')
+        #elements += self.driver.find_elements_by_css_selector('button.button.button-link')
         for e in elements:
             try:
-                e.click()
                 time.sleep(0.5)
+                e.click()
+                webdriver.ActionChains(self.driver).send_keys(Keys.ESCAPE).perform()
             except:
-                pass
+                print('fail click')
             # finally:
                 # print('no click')
+        '''
+        js = "var buttons = document.getElementsByClassName(\'button-link\');for(var i = 0; i <= buttons.length; i++)buttons[i].click();"
+        self.driver.execute_script(js)
+        time.sleep(1)
+        '''
         soup = BeautifulSoup(self.driver.page_source,'html.parser')
         course_title = soup.find_all('h1')[0].text
         lessons = soup.find_all('div',class_='module-name headline-2-text')
