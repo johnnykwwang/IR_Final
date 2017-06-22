@@ -15,14 +15,13 @@ class Abbreviate:
     def __init__(self):
         pass
 
-    def accept_query_term(self):
+    def accept_query_term(self,term):
         term = input("Enter the query term: ")
         self.query_term = term
 
     def de_abbreviation(self, term=None, cate_id='all'):
         if term is None:
             term = self.query_term
-
 
         payload = {
             'sortby': 'p',
@@ -62,7 +61,6 @@ def main():
         term = sys.argv[1]
     except Exception:
         term = None
-
     a = Abbreviate()
     results = a.run_deabbreviate(term)
     print(results)

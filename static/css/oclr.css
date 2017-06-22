@@ -1,0 +1,33 @@
+/* Move down content because we have a fixed navbar that is 50px tall */
+body {
+  padding-top: 2rem;
+}
+
+.main-search-box{
+  font-size: 3rem;
+  padding:20px;
+  background: transparent;
+}
+.main-search-btn{
+  height: 3rem;
+}
+
+.main-search-box:focus, .main-search-box:active{
+  background: transparent;
+}
+
+.modal-body{
+  padding: 10px;
+}
+
+.abv-list{
+  margin-bottom: 5px;
+  padding: 10px;
+  border: 1px solid grey;
+}
+
+
+
+
+
+
