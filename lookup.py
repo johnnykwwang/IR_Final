@@ -8,6 +8,7 @@ from nltk import word_tokenize
 from WikiCrawler import WikiCrawler
 import numpy as np
 import string
+import pickle
 
 class Lookup:
     def stem_tokens(self,tokens, stemmer):
