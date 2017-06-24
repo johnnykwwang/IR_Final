@@ -43,18 +43,21 @@ class Lookup:
             with open('classifier-pickle','wb') as f:
                 pickle.dump([clf, count_vect, tfidf_transformer],f)
         crawler = WikiCrawler()
-        defnition, words = crawler.get_definition('algorithm')
-        docs_new = keywords
-        X_new_counts = count_vect.transform(docs_new)
+        # defnition, words = crawler.get_definition(keywords)
+        X_new_counts = count_vect.transform(keywords)
         X_new_tfidf = tfidf_transformer.transform(X_new_counts)
         predicted = clf.predict(X_new_tfidf)
         probs = clf.predict_proba(X_new_tfidf)
-        
-        for doc, category in zip(docs_new, predicted):
-            print('%r => %s' % (doc, coursera_train.target_names[category]))
+        n = 5
+        best_n = np.argsort(probs, axis=1)[:,::-1][:,:n]
+        for doc, categories in zip(keywords, best_n):
+            print("{}=>".format(doc))
+            for category in categories:
+                print(coursera_train.target_names[category])
+            print('\n', end='')
 
 if __name__ == '__main__':
     lkp = Lookup()
-    keywords = ["Data Structure"]
-    # keywords = ['algorithm and data structure', 'computer network','minimum spanning tree']
+    # keywords = ["Data Structure"]
+    keywords = ['algorithm and data structure', 'computer network','minimum spanning tree']
     lkp.retrieve(keywords=keywords, load_pickle=True)
