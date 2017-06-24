@@ -1,5 +1,8 @@
 # Mac file system files
 *.DS_Store
+mit_course_*/
+*-pickle
+tfidf-transformer
 coursera/
 __pycache__
 # jupyter notebook autosaving files
