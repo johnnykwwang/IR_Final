@@ -20,16 +20,18 @@ def tokenize(text):
     text = "".join([ch for ch in text if ch not in string.punctuation])
     text = "".join([ch for ch in text if ch in string.printable])
     tokens = word_tokenize(text)
-    stems = stem_tokens(tokens, stemmer)
-    return stems
+    # stems = stem_tokens(tokens, stemmer)
+    # return stems
+    return tokens
 
 crawler = WikiCrawler()
 tfidf_transformer = TfidfTransformer()
-coursera_train = load_files('./coursera-cat',load_content=True)
-count_vect = CountVectorizer(tokenizer=tokenize, stop_words='english', ngram_range=(1,2))
+target_dir = './mit_course_subtitles'
+coursera_train = load_files(target_dir,load_content=True)
+count_vect = CountVectorizer(tokenizer=tokenize, stop_words='english')
 
 X_train_counts = count_vect.fit_transform(coursera_train.data)
-print(count_vect.get_feature_names())
+# print(count_vect.get_feature_names())
 X_train_tfidf = tfidf_transformer.fit_transform(X_train_counts)
 #clf = MultinomialNB().fit(X_train_tfidf, coursera_train.target)
 clf = SGDClassifier(loss='log', penalty='l2',alpha=1e-3, n_iter=5, random_state=42).fit(X_train_tfidf, coursera_train.target)
