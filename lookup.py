@@ -1,8 +1,8 @@
 from sklearn.datasets import load_files
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import SGDClassifier
+from sklearn.metrics import classification_report
 from nltk.stem.porter import PorterStemmer
 from nltk import word_tokenize
 from WikiCrawler import WikiCrawler
@@ -11,6 +11,7 @@ from IPython import embed
 import numpy as np
 import re
 import string
+import pickle
 
 class Lookup:
     clf = None
@@ -55,14 +56,11 @@ class Lookup:
             # f = open('tfidf-transformer','rb')
             # tfidf_transformer = pickle.load(f)
         else:
-            tfidf_transformer = TfidfTransformer()
-            target_dir = './mit_course_subtitles'
-            coursera_train = load_files(target_dir,load_content=True)
             count_vect = CountVectorizer(tokenizer=self.tokenize, stop_words='english')
             X_train_counts = count_vect.fit_transform(coursera_train.data)
-            # print(count_vect.get_feature_names())
+            tfidf_transformer = TfidfTransformer()
             X_train_tfidf = tfidf_transformer.fit_transform(X_train_counts)
-            #clf = MultinomialNB().fit(X_train_tfidf, coursera_train.target)
+            # print(count_vect.get_feature_names())
             clf = SGDClassifier(loss='log', penalty='l2',alpha=1e-3, n_iter=5, random_state=42).fit(X_train_tfidf, coursera_train.target)
             f = open('classifier-pickle','wb')
             pickle.dump(clf,f)
@@ -71,15 +69,18 @@ class Lookup:
             f = open('tfidf-transformer','wb')
             pickle.dump(tfidf_transformer,f)
         crawler = WikiCrawler()
-        defnition,words = crawler.get_definition('algorithm')
-        docs_new = [ keyword ]
-        # docs_new = ['algorithm and data structure', 'computer network','minimum spanning tree']
+        defnition, words = crawler.get_definition('algorithm')
+        docs_new = keywords
         X_new_counts = count_vect.transform(docs_new)
         X_new_tfidf = tfidf_transformer.transform(X_new_counts)
         predicted = clf.predict(X_new_tfidf)
         probs = clf.predict_proba(X_new_tfidf)
         print(len(probs[0]))
         retrieved = []
+        for doc, category in zip(docs_new, predicted):
+            print('%r => %s' % (doc, coursera_train.target_names[category]))
+            doc_id = coursera_train.target.tolist().index(category)
+            filename = coursera_train.filenames[doc_id]
         for doc, category in zip(docs_new, predicted):
             print('%r => %s' % (doc, coursera_train.target_names[category]))
             doc_id = coursera_train.target.tolist().index(category)
