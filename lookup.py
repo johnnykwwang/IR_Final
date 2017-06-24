@@ -1,8 +1,8 @@
 from sklearn.datasets import load_files
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import SGDClassifier
+from sklearn.metrics import classification_report
 from nltk.stem.porter import PorterStemmer
 from nltk import word_tokenize
 from WikiCrawler import WikiCrawler
@@ -11,7 +11,7 @@ import string
 import pickle
 
 class Lookup:
-    def stem_tokens(self,tokens, stemmer):
+    def stem_tokens(self, tokens, stemmer):
         stemmed = []
         for item in tokens:
             stemmed.append(stemmer.stem(item))
@@ -26,36 +26,35 @@ class Lookup:
         return stems
         # return tokens
 
-    def retrieve(self,keyword="Algorithms",load_pickle=True):
-        clf = None
+    def retrieve(self, keywords=["Algorithms"], load_pickle=True):
+        # clf = None
+        target_dir = './mit_course_subtitles'
+        coursera_train = load_files(target_dir,load_content=True)
         if load_pickle:
-            f = open('classifier-pickle','rb')
-            clf = pickle.load(f)
+            with open('classifier-pickle','rb') as f:
+                clf, count_vect, tfidf_transformer = pickle.load(f)
         else:
-            tfidf_transformer = TfidfTransformer()
-            target_dir = './mit_course_subtitles'
-            coursera_train = load_files(target_dir,load_content=True)
             count_vect = CountVectorizer(tokenizer=self.tokenize, stop_words='english')
-
             X_train_counts = count_vect.fit_transform(coursera_train.data)
-            # print(count_vect.get_feature_names())
+            tfidf_transformer = TfidfTransformer()
             X_train_tfidf = tfidf_transformer.fit_transform(X_train_counts)
-            #clf = MultinomialNB().fit(X_train_tfidf, coursera_train.target)
+            # print(count_vect.get_feature_names())
             clf = SGDClassifier(loss='log', penalty='l2',alpha=1e-3, n_iter=5, random_state=42).fit(X_train_tfidf, coursera_train.target)
-            f = open('classifier-pickle','wb')
-            pickle.dump(clf,f)
+            with open('classifier-pickle','wb') as f:
+                pickle.dump([clf, count_vect, tfidf_transformer],f)
         crawler = WikiCrawler()
-        defnition,words = crawler.get_definition('algorithm')
-        docs_new = [ keyword ]
-        # docs_new = ['algorithm and data structure', 'computer network','minimum spanning tree']
+        defnition, words = crawler.get_definition('algorithm')
+        docs_new = keywords
         X_new_counts = count_vect.transform(docs_new)
         X_new_tfidf = tfidf_transformer.transform(X_new_counts)
         predicted = clf.predict(X_new_tfidf)
         probs = clf.predict_proba(X_new_tfidf)
-        print(len(probs[0]))
+        
         for doc, category in zip(docs_new, predicted):
             print('%r => %s' % (doc, coursera_train.target_names[category]))
 
 if __name__ == '__main__':
     lkp = Lookup()
-    lkp.retrieve(keyword="Data Structure",load_pickle=False)
+    keywords = ["Data Structure"]
+    # keywords = ['algorithm and data structure', 'computer network','minimum spanning tree']
+    lkp.retrieve(keywords=keywords, load_pickle=True)
