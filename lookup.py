@@ -80,35 +80,38 @@ class Lookup:
         X_new_tfidf = tfidf_transformer.transform(X_new_counts)
         predicted = clf.predict(X_new_tfidf)
         probs = clf.predict_proba(X_new_tfidf)
-
         n = 5
         best_n = np.argsort(probs,axis=1)[:,::-1][:,:n]
         # print(len(probs[0]))
         retrieved = []
         for category in best_n[0]:
             # print('%r => %s' % (doc, coursera_train.target_names[category]))
-            doc_id = coursera_train.target.tolist().index(category)
-            filename = coursera_train.filenames[doc_id]
-            youtube_id = re.findall(r"(.{11}).en.vtt.txt",filename)[0]
-
-            time_stamps = []
-            if return_timestamps:
-                vtt_filenames = filename.split('/')
-                vtt_filenames[1] = vtt_filenames[1] + "_vtt"
-                course_folder_name = re.findall(r"\[(.+)\] (.+)",vtt_filenames[2])[0][0]
-                lesson_folder_name = re.findall(r"\[(.+)\] (.+)",vtt_filenames[2])[0][1] 
-                vtt_filenames[2] = course_folder_name + '/' + lesson_folder_name
-                vtt_filenames[3] = vtt_filenames[3][:-4] 
-                vtt_file = '/'.join(vtt_filenames)
-                converter = CaptionConverter()
-                converter.read(open(vtt_file).read(), WebVTTReader())
-                for cap in converter.captions.get_captions('en-US'):
-                    if keyword.lower() in cap.get_text().lower():
-                        time_stamps.append( { 'time': cap.start / 1000, 'text': cap.get_text() } )
-            h = {'lesson_name':coursera_train.target_names[category],'filename':filename,'youtube_id':youtube_id,'vtt_file':vtt_file,'time_stamps':time_stamps}
-            retrieved.append(h)
+            try:
+                doc_id = coursera_train.target.tolist().index(category)
+                filename = coursera_train.filenames[doc_id]
+                print(filename)
+                youtube_id = re.findall(r"(.{11}).en.vtt.txt",filename)[0]
+                time_stamps = []
+                vtt_file=""
+                if return_timestamps:
+                    vtt_filenames = filename.split('/')
+                    vtt_filenames[1] = vtt_filenames[1] + "_vtt"
+                    course_folder_name = re.findall(r"\[(.+)\] (.+)",vtt_filenames[2])[0][0]
+                    lesson_folder_name = re.findall(r"\[(.+)\] (.+)",vtt_filenames[2])[0][1] 
+                    vtt_filenames[2] = course_folder_name + '/' + lesson_folder_name
+                    vtt_filenames[3] = vtt_filenames[3][:-4] 
+                    vtt_file = '/'.join(vtt_filenames)
+                    converter = CaptionConverter()
+                    converter.read(open(vtt_file).read(), WebVTTReader())
+                    for cap in converter.captions.get_captions('en-US'):
+                        if keyword.lower() in cap.get_text().lower():
+                            time_stamps.append( { 'time': cap.start / 1000, 'text': cap.get_text() } )
+                h = {'lesson_name':coursera_train.target_names[category],'filename':filename,'youtube_id':youtube_id,'vtt_file':vtt_file,'time_stamps':time_stamps}
+                retrieved.append(h)
+            except Exception:
+                pass
         return retrieved
 
 if __name__ == '__main__':
-    lkp = Lookup(load_pickle=False)
-    lkp.retrieve(keyword="Data Structure",load_pickle=False)
+    lkp = Lookup(load_pickle=True)
+    lkp.retrieve(keyword="Data Structure",load_pickle=True)
