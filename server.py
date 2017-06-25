@@ -37,7 +37,6 @@ def search():
         keyword = request.args.get('q')
         # lesson_list = [{'course_name':'','lesson_name':'','youtube_id':''}]
         lesson_list = lookup.retrieve(keyword)
-        print(lesson_list)
         return render_template('results.html',keyword=keyword,lesson_list=lesson_list)
 
 if __name__ == '__main__':
