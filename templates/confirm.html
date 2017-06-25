@@ -12,10 +12,17 @@
       <div class="modal-body">
         What are you searching for?
         {% for abv in de_abv_list[0:5] %}
-          <a href="/search?q={{abv}}">
+          <a href="/search?q={{abv}}" class="abbrev">
           <div class="col-md-12 abv-list">{{ abv }}</div>
           </a>
         {% endfor %}
+        <div class="sk-wave sk-abbrev" style="display:none;">
+          <div class="sk-rect sk-rect1"></div>
+          <div class="sk-rect sk-rect2"></div>
+          <div class="sk-rect sk-rect3"></div>
+          <div class="sk-rect sk-rect4"></div>
+          <div class="sk-rect sk-rect5"></div>
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -29,5 +36,8 @@
 {% block js %}
   <script>
     $('#myModal').modal('show');
+    $('.abbrev').on('click',function(){
+      $('.sk-abbrev').show();
+    });
   </script>
 {% endblock %}

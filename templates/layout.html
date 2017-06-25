@@ -12,10 +12,10 @@
     <!-- Custom styles for this template -->
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/oclr.css') }}">
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/pace.css') }}">
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/spinner.css') }}">
   </head>
 
   <body>
-
     <nav class="navbar navbar-toggleable-md navbar-inverse fixed-top bg-inverse">
       <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -52,6 +52,15 @@
         <form class="" action='/search_init' method="POST" >
           <input class="form-control main-search-box" type="text" name="keyword" placeholder="Find your desired lesson">
         </form>
+        <div>
+          <div class="sk-wave" style="display:none;">
+            <div class="sk-rect sk-rect1"></div>
+            <div class="sk-rect sk-rect2"></div>
+            <div class="sk-rect sk-rect3"></div>
+            <div class="sk-rect sk-rect4"></div>
+            <div class="sk-rect sk-rect5"></div>
+          </div>
+        </div>
         </div>
         <!-- <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more &raquo;</a></p> -->
       </div>
@@ -93,20 +102,10 @@
     <!-- <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
-    <script>
-      paceOptions = {
-    // Disable the 'elements' source
-    elements: false,
-
-    // Only show the progress on regular and ajax-y page navigation,
-    // not every request
-    restartOnRequestAfter: true
-  }
-    </script>
-    <script src="{{ url_for('static', filename='js/pace.min.js') }}"></script>
+    <!-- <script src="{{ url_for('static', filename='js/pace.min.js') }}"></script> -->
     <script>
     $('form').on('submit',function(){
-      Pace.restart()
+      $('.sk-wave').show();
     });
     </script>
     
