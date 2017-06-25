@@ -6,6 +6,10 @@ from sklearn.metrics import classification_report
 from nltk.stem.porter import PorterStemmer
 from nltk import word_tokenize
 from WikiCrawler import WikiCrawler
+from pycaption import *
+from pycaption import transcript
+# from pycaption.base import CaptionConverter
+from pycaption.base import BaseWriter, CaptionNode
 import pickle
 from IPython import embed
 import numpy as np
@@ -70,7 +74,7 @@ class Lookup:
             pickle.dump(tfidf_transformer,f)
         crawler = WikiCrawler()
         defnition, words = crawler.get_definition('algorithm')
-        docs_new = keywords
+        docs_new = [keyword]
         X_new_counts = count_vect.transform(docs_new)
         X_new_tfidf = tfidf_transformer.transform(X_new_counts)
         predicted = clf.predict(X_new_tfidf)
@@ -81,12 +85,22 @@ class Lookup:
             print('%r => %s' % (doc, coursera_train.target_names[category]))
             doc_id = coursera_train.target.tolist().index(category)
             filename = coursera_train.filenames[doc_id]
-        for doc, category in zip(docs_new, predicted):
-            print('%r => %s' % (doc, coursera_train.target_names[category]))
-            doc_id = coursera_train.target.tolist().index(category)
-            filename = coursera_train.filenames[doc_id]
             youtube_id = re.findall(r"(.{11}).en.vtt.txt",filename)[0]
-            h = {'lesson_name':coursera_train.target_names[category],'filename':filename,'youtube_id':youtube_id}
+            vtt_filenames = filename.split('/')
+            vtt_filenames[1] = vtt_filenames[1] + "_vtt"
+            course_folder_name = re.findall(r"\[(.+)\] (.+)",vtt_filenames[2])[0][0]
+            lesson_folder_name = re.findall(r"\[(.+)\] (.+)",vtt_filenames[2])[0][1] 
+            vtt_filenames[2] = course_folder_name + '/' + lesson_folder_name
+            vtt_filenames[3] = vtt_filenames[3][:-4] 
+            vtt_file = '/'.join(vtt_filenames)
+            converter = CaptionConverter()
+            converter.read(open(vtt_file).read(), WebVTTReader())
+            time_stamps = []
+            for cap in converter.captions.get_captions('en-US'):
+                if keyword.lower() in cap.get_text().lower():
+                    time_stamps.append( { 'time': cap.start / 1000, 'text': cap.get_text() } )
+            h = {'lesson_name':coursera_train.target_names[category],'filename':filename,'youtube_id':youtube_id,'vtt_file':vtt_file,'time_stamps':time_stamps}
+            embed()
             retrieved.append(h)
         return retrieved
 
