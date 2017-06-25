@@ -24,12 +24,12 @@ class Lookup:
 
     def __init__(self,load_pickle=True):
         if load_pickle:
-            f = open('classifier-pickle','rb')
-            self.clf = pickle.load(f)
-            f = open('count-vect-pickle','rb')
-            self.count_vect = pickle.load(f)
-            f = open('tfidf-transformer','rb')
-            self.tfidf_transformer = pickle.load(f)
+            f = open('classifier-all-pickle','rb')
+            self.clf, self.count_vect, self.tfidf_transformer = pickle.load(f)
+            # f = open('count-vect-pickle','rb')
+            # self.count_vect = pickle.load(f)
+            # f = open('tfidf-transformer','rb')
+            # self.tfidf_transformer = pickle.load(f)
 
     def stem_tokens(self,tokens, stemmer):
         stemmed = []
@@ -41,10 +41,10 @@ class Lookup:
         text = "".join([ch for ch in text if ch not in string.punctuation])
         text = "".join([ch for ch in text if ch in string.printable])
         tokens = word_tokenize(text)
-        # stemmer = PorterStemmer()
-        # stems = self.stem_tokens(tokens, stemmer)
-        # return stems
-        return tokens
+        stemmer = PorterStemmer()
+        stems = self.stem_tokens(tokens, stemmer)
+        return stems
+        # return tokens
 
     def retrieve(self,keyword="Algorithms",load_pickle=True):
         if load_pickle:
@@ -61,28 +61,32 @@ class Lookup:
             # tfidf_transformer = pickle.load(f)
         else:
             count_vect = CountVectorizer(tokenizer=self.tokenize, stop_words='english')
+            target_dir = './mit_course_subtitles'
+            coursera_train = load_files(target_dir,load_content=True)
             X_train_counts = count_vect.fit_transform(coursera_train.data)
             tfidf_transformer = TfidfTransformer()
             X_train_tfidf = tfidf_transformer.fit_transform(X_train_counts)
             # print(count_vect.get_feature_names())
             clf = SGDClassifier(loss='log', penalty='l2',alpha=1e-3, n_iter=5, random_state=42).fit(X_train_tfidf, coursera_train.target)
-            f = open('classifier-pickle','wb')
-            pickle.dump(clf,f)
-            f = open('count-vect-pickle','wb')
-            pickle.dump(count_vect,f)
-            f = open('tfidf-transformer','wb')
-            pickle.dump(tfidf_transformer,f)
+            f = open('classifier-all-pickle','wb')
+            pickle.dump([clf,count_vect,tfidf_transformer],f)
+            # f = open('count-vect-pickle','wb')
+            # pickle.dump(count_vect,f)
+            # f = open('tfidf-transformer','wb')
+            # pickle.dump(tfidf_transformer,f)
         crawler = WikiCrawler()
         defnition, words = crawler.get_definition('algorithm')
-        docs_new = [keyword]
-        X_new_counts = count_vect.transform(docs_new)
+        X_new_counts = count_vect.transform([keyword])
         X_new_tfidf = tfidf_transformer.transform(X_new_counts)
         predicted = clf.predict(X_new_tfidf)
         probs = clf.predict_proba(X_new_tfidf)
-        print(len(probs[0]))
+
+        n = 5
+        best_n = np.argsort(probs,axis=1)[:,::-1][:,:n]
+        # print(len(probs[0]))
         retrieved = []
-        for doc, category in zip(docs_new, predicted):
-            print('%r => %s' % (doc, coursera_train.target_names[category]))
+        for category in best_n[0]:
+            # print('%r => %s' % (doc, coursera_train.target_names[category]))
             doc_id = coursera_train.target.tolist().index(category)
             filename = coursera_train.filenames[doc_id]
             youtube_id = re.findall(r"(.{11}).en.vtt.txt",filename)[0]
@@ -100,10 +104,9 @@ class Lookup:
                 if keyword.lower() in cap.get_text().lower():
                     time_stamps.append( { 'time': cap.start / 1000, 'text': cap.get_text() } )
             h = {'lesson_name':coursera_train.target_names[category],'filename':filename,'youtube_id':youtube_id,'vtt_file':vtt_file,'time_stamps':time_stamps}
-            embed()
             retrieved.append(h)
         return retrieved
 
 if __name__ == '__main__':
-    lkp = Lookup()
-    lkp.retrieve(keyword="Data Structure",load_pickle=True)
+    lkp = Lookup(load_pickle=False)
+    lkp.retrieve(keyword="Data Structure",load_pickle=False)
