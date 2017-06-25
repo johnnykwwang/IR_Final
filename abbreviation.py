@@ -11,6 +11,14 @@ class Abbreviate:
     ]
     uid = 5812
     tid = '1I3AHWHDOvS3SSX7'
+    freq_used_cat = [
+        'computing', 'assembly', 'security',
+        'databases', 'dos', 'drivers',
+        'fileext', 'gaming', 'general',
+        'hardware', 'java', 'networking',
+        'software', 'technology', 'telecom'
+        'texting', 'unix',
+    ]
 
     def __init__(self):
         pass
@@ -19,7 +27,7 @@ class Abbreviate:
         term = input("Enter the query term: ")
         self.query_term = term
 
-    def de_abbreviation(self, term=None, cate_id='all'):
+    def de_abbreviation(self, term=None, cate_id=None):
         if term is None:
             term = self.query_term
 
@@ -27,7 +35,7 @@ class Abbreviate:
         payload = {
             'sortby': 'p',
             'term': term,
-            'categorid': cate_id,
+            'categoryid': cate_id,
             'uid': self.uid,
             'tokenid': self.tid,
             'searchtype': 'e'
@@ -37,23 +45,34 @@ class Abbreviate:
         return response.content
 
     def parse_abb_response(self, response, cate=None):
+        if cate is None:
+            cate = self.freq_used_cat
+
         # parse the response from www.abbreivations.com
         root = ET.fromstring(response)
         result = []
         for each_result in list(root):
+            tmp = {}
             for tag in list(each_result):
                 if tag.tag == 'definition':
-                    result.append(tag.text)
+                    tmp['def'] = tag.text
+                elif tag.tag == 'category':
+                    tmp['cat'] = tag.text.lower()
+            if cate is not None:
+                if tmp['cat'] in cate:
+                    result.append(tmp['def'])
+            else:
+                result.append(tmp['def'])
         return result
         
-    def run_deabbreviate(self, term=None):
+    def run_deabbreviate(self, term=None, cate=None):
         if term is None:
             self.accept_query_term()
         else:
             self.query_term = term
 
         response = self.de_abbreviation()
-        results = self.parse_abb_response(response)
+        results = self.parse_abb_response(response, cate)
         return results
 
 
@@ -63,8 +82,13 @@ def main():
     except Exception:
         term = None
 
+    try:
+        cate = sys.argv[2]
+    except Exception:
+        cate = None
+
     a = Abbreviate()
-    results = a.run_deabbreviate(term)
+    results = a.run_deabbreviate(term, cate)
     print(results)
     return results
 
