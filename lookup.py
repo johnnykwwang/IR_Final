@@ -114,4 +114,6 @@ class Lookup:
 
 if __name__ == '__main__':
     lkp = Lookup(load_pickle=True)
-    lkp.retrieve(keyword="Data Structure",load_pickle=True)
+    keywords = ["algorithms", "Data Structure"]
+    for keyword in keywords:
+        print(lkp.retrieve(keyword=keyword,load_pickle=True))
