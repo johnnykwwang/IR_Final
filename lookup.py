@@ -1,15 +1,13 @@
 from sklearn.datasets import load_files
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
-from sklearn.linear_model import SGDClassifier
+# from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import classification_report
-from sklearn.neighbors import NearestNeighbors
+# from sklearn.neighbors import NearestNeighbors
 from sklearn.neighbors import LSHForest
 from nltk.stem.porter import PorterStemmer
 from nltk import word_tokenize
 from WikiCrawler import WikiCrawler
 from pycaption import *
-from pycaption import transcript
-# from pycaption.base import CaptionConverter
 from pycaption.base import BaseWriter, CaptionNode
 import pickle
 from IPython import embed
