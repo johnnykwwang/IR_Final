@@ -105,7 +105,7 @@ class Lookup:
                     converter.read(open(vtt_file).read(), WebVTTReader())
                     for cap in converter.captions.get_captions('en-US'):
                         if keyword.lower() in cap.get_text().lower():
-                            time_stamps.append( { 'time': cap.start / 1000, 'text': cap.get_text() } )
+                            time_stamps.append( { 'time': cap.start / 1000000, 'text': cap.get_text() } )
                 h = {'lesson_name':coursera_train.target_names[category],'filename':filename,'youtube_id':youtube_id,'vtt_file':vtt_file,'time_stamps':time_stamps}
                 retrieved.append(h)
             except Exception:

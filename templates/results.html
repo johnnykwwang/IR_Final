@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block body %}
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
+  <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">Search for {{ keyword }}</h5>
@@ -9,13 +9,30 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body">
-        Lessons:
-        {% for lesson in lesson_list %}
-        <iframe width="420" height="315"
-                            src="https://www.youtube.com/embed/{{lesson['youtube_id']}}">
-        </iframe>
-        {% endfor %}
+      <div class="modal-body text-center">
+
+      {% for lesson in lesson_list %}
+        {% set les_id = loop.index %}
+        <div class="card">
+          <div class="card-header" role="tab" id="heading_{{les_id}}">
+            <h5 class="mb-0">
+              <a data-toggle="collapse" data-parent="#accordion" href="#collapse_{{les_id}}" aria-expanded="true" aria-controls="collapse_{{les_id}}">{{lesson['lesson_name']}}</a>
+            </h5>
+          </div>
+
+          <div id="collapse_{{les_id}}" class="collapse show" role="tabpanel" aria-labelledby="heading_{{les_id}}">
+            <div class="card-block">
+              <div id="player_{{loop.index}}"></div>
+              {% for ts in lesson['time_stamps'] %}
+              <a href='#' onclick="player_{{les_id}}.seekTo({{ts['time']}},false);">
+                {{ts['text']}}
+              </a>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -28,6 +45,31 @@
 
 {% block js %}
   <script>
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+
+
+    {% for lesson in lesson_list %}
+    var player_{{loop.index}};
+    {% endfor %}
+    function onYouTubeIframeAPIReady() {
+      {% for lesson in lesson_list %}
+      player_{{loop.index}} = new YT.Player('player_{{loop.index}}', {
+        height: '390',
+        width: '640',
+        videoId: '{{lesson['youtube_id']}}',
+        events: {
+        }
+      });
+      {% endfor %}
+    }
+
+
+
     $('#myModal').modal('show');
+    $('.collapse').collapse()
   </script>
 {% endblock %}

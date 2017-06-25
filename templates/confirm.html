@@ -16,6 +16,10 @@
           <div class="col-md-12 abv-list">{{ abv }}</div>
           </a>
         {% endfor %}
+        None of above? Enter below:
+        <form action='/search' method='GET'>
+          <input type='text' class="form-control" name='q'>
+        </form>
         <div class="sk-wave sk-abbrev" style="display:none;">
           <div class="sk-rect sk-rect1"></div>
           <div class="sk-rect sk-rect2"></div>

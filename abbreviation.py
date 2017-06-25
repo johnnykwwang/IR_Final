@@ -15,7 +15,7 @@ class Abbreviate:
     def __init__(self):
         pass
 
-    def accept_query_term(self,term):
+    def accept_query_term(self):
         term = input("Enter the query term: ")
         self.query_term = term
 
