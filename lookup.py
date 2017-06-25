@@ -6,12 +6,32 @@ from sklearn.metrics import classification_report
 from nltk.stem.porter import PorterStemmer
 from nltk import word_tokenize
 from WikiCrawler import WikiCrawler
+from pycaption import *
+from pycaption import transcript
+# from pycaption.base import CaptionConverter
+from pycaption.base import BaseWriter, CaptionNode
+import pickle
+from IPython import embed
 import numpy as np
+import re
 import string
 import pickle
 
 class Lookup:
-    def stem_tokens(self, tokens, stemmer):
+    clf = None
+    count_vect = None
+    tfidf_transformer = None
+
+    def __init__(self,load_pickle=True):
+        if load_pickle:
+            f = open('classifier-pickle','rb')
+            self.clf = pickle.load(f)
+            f = open('count-vect-pickle','rb')
+            self.count_vect = pickle.load(f)
+            f = open('tfidf-transformer','rb')
+            self.tfidf_transformer = pickle.load(f)
+
+    def stem_tokens(self,tokens, stemmer):
         stemmed = []
         for item in tokens:
             stemmed.append(stemmer.stem(item))
@@ -29,8 +49,17 @@ class Lookup:
         target_dir = './mit_course_subtitles'
         coursera_train = load_files(target_dir,load_content=True)
         if load_pickle:
-            with open('classifier-pickle','rb') as f:
-                clf, count_vect, tfidf_transformer = pickle.load(f)
+            clf = self.clf
+            count_vect = self.count_vect
+            tfidf_transformer = self.tfidf_transformer
+            target_dir = './mit_course_subtitles'
+            coursera_train = load_files(target_dir,load_content=True)
+            # f = open('classifier-pickle','rb')
+            # clf = pickle.load(f)
+            # f = open('count-vect-pickle','rb')
+            # count_vect = pickle.load(f)
+            # f = open('tfidf-transformer','rb')
+            # tfidf_transformer = pickle.load(f)
         else:
             count_vect = CountVectorizer(tokenizer=self.tokenize, stop_words='english')
             X_train_counts = count_vect.fit_transform(coursera_train.data)
@@ -59,3 +88,4 @@ if __name__ == '__main__':
     keywords = ['algorithm and data structure', 'computer network','minimum spanning tree']
     for key in keywords:
         lkp.retrieve(keywords=key, load_pickle=True)
+
