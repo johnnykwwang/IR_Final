@@ -92,6 +92,7 @@ class Lookup:
             youtube_id = re.findall(r"(.{11}).en.vtt.txt",filename)[0]
 
             time_stamps = []
+            vtt_file = ''
             if return_timestamps:
                 vtt_filenames = filename.split('/')
                 vtt_filenames[1] = vtt_filenames[1] + "_vtt"
@@ -110,5 +111,7 @@ class Lookup:
         return retrieved
 
 if __name__ == '__main__':
-    lkp = Lookup(load_pickle=False)
-    lkp.retrieve(keyword="Data Structure",load_pickle=False)
+    lkp = Lookup(load_pickle=True)
+    keywords = ["algorithms", "Data Structure"]
+    for keyword in keywords:
+        print(lkp.retrieve(keyword=keyword,load_pickle=True))
