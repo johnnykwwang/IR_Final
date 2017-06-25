@@ -1,8 +1,9 @@
 from sklearn.datasets import load_files
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
-from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import classification_report
+from sklearn.neighbors import NearestNeighbors
+from sklearn.neighbors import LSHForest
 from nltk.stem.porter import PorterStemmer
 from nltk import word_tokenize
 from WikiCrawler import WikiCrawler
@@ -17,6 +18,7 @@ import re
 import string
 import pickle
 
+
 class Lookup:
     clf = None
     count_vect = None
@@ -26,10 +28,6 @@ class Lookup:
         if load_pickle:
             f = open('classifier-all-pickle','rb')
             self.clf, self.count_vect, self.tfidf_transformer = pickle.load(f)
-            # f = open('count-vect-pickle','rb')
-            # self.count_vect = pickle.load(f)
-            # f = open('tfidf-transformer','rb')
-            # self.tfidf_transformer = pickle.load(f)
 
     def stem_tokens(self,tokens, stemmer):
         stemmed = []
@@ -44,7 +42,6 @@ class Lookup:
         stemmer = PorterStemmer()
         stems = self.stem_tokens(tokens, stemmer)
         return stems
-        # return tokens
 
     def retrieve(self,keyword="Algorithms",load_pickle=True,return_timestamps=False):
         if load_pickle:
@@ -53,12 +50,6 @@ class Lookup:
             tfidf_transformer = self.tfidf_transformer
             target_dir = './mit_course_subtitles'
             coursera_train = load_files(target_dir,load_content=True)
-            # f = open('classifier-pickle','rb')
-            # clf = pickle.load(f)
-            # f = open('count-vect-pickle','rb')
-            # count_vect = pickle.load(f)
-            # f = open('tfidf-transformer','rb')
-            # tfidf_transformer = pickle.load(f)
         else:
             count_vect = CountVectorizer(tokenizer=self.tokenize, stop_words='english')
             target_dir = './mit_course_subtitles'
@@ -66,30 +57,26 @@ class Lookup:
             X_train_counts = count_vect.fit_transform(coursera_train.data)
             tfidf_transformer = TfidfTransformer()
             X_train_tfidf = tfidf_transformer.fit_transform(X_train_counts)
-            # print(count_vect.get_feature_names())
-            clf = SGDClassifier(loss='log', penalty='l2',alpha=1e-3, n_iter=5, random_state=42).fit(X_train_tfidf, coursera_train.target)
+            # clf = SGDClassifier(loss='log', penalty='l2',alpha=1e-3, n_iter=5, random_state=42).fit(X_train_tfidf, coursera_train.target)
+            # clf = NearestNeighbors(n_neighbors=5, radius=1.0, algorithm='ball_tree', leaf_size=30, metric='cosine', p=2, metric_params=None, n_jobs=-1)
+            clf = LSHForest(random_state=42).fit(X_train_tfidf, coursera_train.target)
             f = open('classifier-all-pickle','wb')
             pickle.dump([clf,count_vect,tfidf_transformer],f)
-            # f = open('count-vect-pickle','wb')
-            # pickle.dump(count_vect,f)
-            # f = open('tfidf-transformer','wb')
-            # pickle.dump(tfidf_transformer,f)
         crawler = WikiCrawler()
-        defnition, words = crawler.get_definition('algorithm')
+        # defnition, words = crawler.get_definition('algorithm')
         X_new_counts = count_vect.transform([keyword])
         X_new_tfidf = tfidf_transformer.transform(X_new_counts)
-        predicted = clf.predict(X_new_tfidf)
-        probs = clf.predict_proba(X_new_tfidf)
-        n = 5
-        best_n = np.argsort(probs,axis=1)[:,::-1][:,:n]
-        # print(len(probs[0]))
+        # probs = clf.predict_proba(X_new_tfidf)
+        # print(np.percentile(probs[0],1))
+        # n = 5
+        # best_n = np.argsort(probs,axis=1)[:,::-1][:,:n]
+        _, result  = clf.radius_neighbors(X_new_tfidf, 1)
         retrieved = []
-        for category in best_n[0]:
-            # print('%r => %s' % (doc, coursera_train.target_names[category]))
+        # for category in best_n[0]:
+        for category in result[0]:
             try:
                 doc_id = coursera_train.target.tolist().index(category)
                 filename = coursera_train.filenames[doc_id]
-                print(filename)
                 youtube_id = re.findall(r"(.{11}).en.vtt.txt",filename)[0]
                 time_stamps = []
                 vtt_file=""
@@ -116,4 +103,8 @@ if __name__ == '__main__':
     lkp = Lookup(load_pickle=True)
     keywords = ["algorithms", "Data Structure"]
     for keyword in keywords:
-        print(lkp.retrieve(keyword=keyword,load_pickle=True))
+        print(keyword)
+        result = lkp.retrieve(keyword=keyword,load_pickle=True)
+        for i in range(len(result)):
+            print(result[i]['lesson_name'])
+        print('\n',end='')
