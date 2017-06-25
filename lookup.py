@@ -46,7 +46,7 @@ class Lookup:
         return stems
         # return tokens
 
-    def retrieve(self,keyword="Algorithms",load_pickle=True):
+    def retrieve(self,keyword="Algorithms",load_pickle=True,return_timestamps=False):
         if load_pickle:
             clf = self.clf
             count_vect = self.count_vect
@@ -90,19 +90,21 @@ class Lookup:
             doc_id = coursera_train.target.tolist().index(category)
             filename = coursera_train.filenames[doc_id]
             youtube_id = re.findall(r"(.{11}).en.vtt.txt",filename)[0]
-            vtt_filenames = filename.split('/')
-            vtt_filenames[1] = vtt_filenames[1] + "_vtt"
-            course_folder_name = re.findall(r"\[(.+)\] (.+)",vtt_filenames[2])[0][0]
-            lesson_folder_name = re.findall(r"\[(.+)\] (.+)",vtt_filenames[2])[0][1] 
-            vtt_filenames[2] = course_folder_name + '/' + lesson_folder_name
-            vtt_filenames[3] = vtt_filenames[3][:-4] 
-            vtt_file = '/'.join(vtt_filenames)
-            converter = CaptionConverter()
-            converter.read(open(vtt_file).read(), WebVTTReader())
+
             time_stamps = []
-            for cap in converter.captions.get_captions('en-US'):
-                if keyword.lower() in cap.get_text().lower():
-                    time_stamps.append( { 'time': cap.start / 1000, 'text': cap.get_text() } )
+            if return_timestamps:
+                vtt_filenames = filename.split('/')
+                vtt_filenames[1] = vtt_filenames[1] + "_vtt"
+                course_folder_name = re.findall(r"\[(.+)\] (.+)",vtt_filenames[2])[0][0]
+                lesson_folder_name = re.findall(r"\[(.+)\] (.+)",vtt_filenames[2])[0][1] 
+                vtt_filenames[2] = course_folder_name + '/' + lesson_folder_name
+                vtt_filenames[3] = vtt_filenames[3][:-4] 
+                vtt_file = '/'.join(vtt_filenames)
+                converter = CaptionConverter()
+                converter.read(open(vtt_file).read(), WebVTTReader())
+                for cap in converter.captions.get_captions('en-US'):
+                    if keyword.lower() in cap.get_text().lower():
+                        time_stamps.append( { 'time': cap.start / 1000, 'text': cap.get_text() } )
             h = {'lesson_name':coursera_train.target_names[category],'filename':filename,'youtube_id':youtube_id,'vtt_file':vtt_file,'time_stamps':time_stamps}
             retrieved.append(h)
         return retrieved
