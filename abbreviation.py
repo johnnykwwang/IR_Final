@@ -23,14 +23,13 @@ class Abbreviate:
     def __init__(self):
         pass
 
-    def accept_query_term(self):
+    def accept_query_term(self,term):
         term = input("Enter the query term: ")
         self.query_term = term
 
     def de_abbreviation(self, term=None, cate_id=None):
         if term is None:
             term = self.query_term
-
 
         payload = {
             'sortby': 'p',

@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Search for {{ keyword }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        What are you searching for?
+        {% for abv in de_abv_list[0:5] %}
+          <a href="/search?q={{abv}}" class="abbrev">
+          <div class="col-md-12 abv-list">{{ abv }}</div>
+          </a>
+        {% endfor %}
+        <div class="sk-wave sk-abbrev" style="display:none;">
+          <div class="sk-rect sk-rect1"></div>
+          <div class="sk-rect sk-rect2"></div>
+          <div class="sk-rect sk-rect3"></div>
+          <div class="sk-rect sk-rect4"></div>
+          <div class="sk-rect sk-rect5"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+  <script>
+    $('#myModal').modal('show');
+    $('.abbrev').on('click',function(){
+      $('.sk-abbrev').show();
+    });
+  </script>
+{% endblock %}

@@ -63,6 +63,7 @@ class MITCrawler:
         units = soup.find_all('div',class_='tlp_links')
         lessons = [ u.select('li a') for u in units ]
         lessons_all = list(itertools.chain.from_iterable(lessons))
+        course_h = {'url':course_url, 'title': course_title, 'lessons': []}
         lessons_all = [ {'link': les['href'], 'name': les.text } for les in lessons_all ]
         for lesson in lessons_all:
             try:
@@ -76,9 +77,11 @@ class MITCrawler:
                 lesson['script'] = transcript
             except IndexError:
                 print('quiz or srt not found')
+                embed()
             except KeyError:
                 print('Lesson error')
         # self.collection.insert({'course_title':course_title,'lessons':lessons_all})
+        course_h['lessons'] = lessons_all
         with open('mit-courses-transcript/'+course_title.replace('/',' '),'wb+') as f:
             pickle.dump(lessons_all,f)
 
