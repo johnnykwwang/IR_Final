@@ -111,12 +111,7 @@ class Lookup:
         return retrieved
 
 if __name__ == '__main__':
-<<<<<<< HEAD
     lkp = Lookup(load_pickle=True)
     keywords = ["algorithms", "Data Structure"]
     for keyword in keywords:
         print(lkp.retrieve(keyword=keyword,load_pickle=True))
-=======
-    lkp = Lookup(load_pickle=False)
-    lkp.retrieve(keyword="Data Structure",load_pickle=False)
->>>>>>> master
