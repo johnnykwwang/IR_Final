@@ -23,11 +23,18 @@
           <div id="collapse_{{les_id}}" class="collapse show" role="tabpanel" aria-labelledby="heading_{{les_id}}">
             <div class="card-block">
               <div id="player_{{loop.index}}"></div>
-              {% for ts in lesson['time_stamps'] %}
-              <a href='#' onclick="player_{{les_id}}.seekTo({{ts['time']}},false);">
-                {{ts['text']}}
-              </a>
-              {% endfor %}
+              <h4>Transcript</h4>
+              <div class="transcript">
+                {% for ts in lesson['time_stamps'] %}
+                {% if ts['contains'] %}
+                <a href='#' onclick="player_{{les_id}}.seekTo({{ts['time']}},false);">
+                  {{ts['text']}}
+                </a>
+                {% else %}
+                  {{ts['text']}}
+                {% endif %}
+                {% endfor %}
+              </div>
             </div>
           </div>
         </div>
