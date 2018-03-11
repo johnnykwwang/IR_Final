@@ -1,6 +1,4 @@
 import os
-from webvtt import WebVTT
-from IPython import embed
 from pycaption import *
 from pycaption import transcript
 from pycaption.base import BaseWriter, CaptionNode
@@ -34,5 +32,6 @@ def recursive_walk(folder):
                 os.makedirs(new_folderName)
             f = open(new_folderName+'/'+filename+".txt", 'w')
             f.write(script)
+
 
 recursive_walk('mit_course_subtitles')
