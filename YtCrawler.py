@@ -1,6 +1,5 @@
-# from __future__ import unicode_literals
 import youtube_dl
-from IPython import embed
+
 
 class MyLogger(object):
     def debug(self, msg):
@@ -12,11 +11,11 @@ class MyLogger(object):
     def error(self, msg):
         print(msg)
 
+
 ydl_opts = {
     # 'logger': MyLogger(),
     'writesubtitles': 'True',
     'skip_download': 'True',
-    # 'outtmpl': 'mit_course_transcript/%(playlist_title)s/%(title)s-%(id)s.%(ext)s'
     'outtmpl': 'mit_course_subtitles/%(playlist_title)s/%(title)s/%(title)s-%(id)s.%(ext)s'
 }
 
