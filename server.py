@@ -40,6 +40,7 @@ def search():
         print(lesson_list)
         return render_template('results.html', keyword=keyword, lesson_list=lesson_list)
 
+
 if __name__ == '__main__':
     app.jinja_env.auto_reload = True
     app.before_request(before_request)

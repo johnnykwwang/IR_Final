@@ -10,7 +10,6 @@ from WikiCrawler import WikiCrawler
 from pycaption import *
 from pycaption.base import BaseWriter, CaptionNode
 import pickle
-from IPython import embed
 import numpy as np
 import re
 import string
@@ -22,7 +21,7 @@ class Lookup:
     count_vect = None
     tfidf_transformer = None
 
-    def __init__(self,load_pickle=True):
+    def __init__(self, load_pickle=False):
         if load_pickle:
             f = open('classifier-all-pickle','rb')
             self.clf, self.count_vect, self.tfidf_transformer = pickle.load(f)
@@ -51,7 +50,7 @@ class Lookup:
         else:
             count_vect = CountVectorizer(tokenizer=self.tokenize, stop_words='english')
             target_dir = './mit_course_subtitles'
-            coursera_train = load_files(target_dir,load_content=True)
+            coursera_train = load_files(target_dir, load_content=True)
             X_train_counts = count_vect.fit_transform(coursera_train.data)
             tfidf_transformer = TfidfTransformer()
             X_train_tfidf = tfidf_transformer.fit_transform(X_train_counts)
@@ -99,12 +98,13 @@ class Lookup:
                 pass
         return retrieved
 
+
 if __name__ == '__main__':
-    lkp = Lookup(load_pickle=True)
+    lkp = Lookup(load_pickle=False)
     keywords = ["algorithms", "Data Structure"]
     for keyword in keywords:
         print(keyword)
-        result = lkp.retrieve(keyword=keyword,load_pickle=True)
+        result = lkp.retrieve(keyword=keyword, load_pickle=False)
         for i in range(len(result)):
             print(result[i]['lesson_name'])
         print('\n',end='')
